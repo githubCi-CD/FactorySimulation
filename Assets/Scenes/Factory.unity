@@ -8495,7 +8495,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   StartConvey: {fileID: 2137372767}
-  ProductObject: {fileID: 8200102457171739874, guid: 1bd179db919d25c42b8337fb70f348ce, type: 3}
+  ProductObject: {fileID: 1822032353278707300, guid: 1bd179db919d25c42b8337fb70f348ce, type: 3}
   HeiaraycyProductList: {fileID: 1917913816}
   NegativeElectrodeBox:
   - {fileID: 425168040}
@@ -11053,7 +11053,7 @@ MonoBehaviour:
       Data: ACTIVE_LIQUID
     - Name: $v
       Entry: 4
-      Data: 250
+      Data: 1000
     - Name: 
       Entry: 8
       Data: 
@@ -11065,7 +11065,7 @@ MonoBehaviour:
       Data: NMP
     - Name: $v
       Entry: 4
-      Data: 250
+      Data: 1000
     - Name: 
       Entry: 8
       Data: 
@@ -11077,7 +11077,7 @@ MonoBehaviour:
       Data: NEGATIVE_ELECTRODE
     - Name: $v
       Entry: 4
-      Data: 50
+      Data: 100
     - Name: 
       Entry: 8
       Data: 
@@ -11117,7 +11117,7 @@ MonoBehaviour:
       Data: ACTIVE_LIQUID
     - Name: $v
       Entry: 4
-      Data: 500
+      Data: 1000
     - Name: 
       Entry: 8
       Data: 
@@ -11129,7 +11129,7 @@ MonoBehaviour:
       Data: ELECTROLYTIC
     - Name: $v
       Entry: 4
-      Data: 1000
+      Data: 500
     - Name: 
       Entry: 8
       Data: 
@@ -11153,7 +11153,7 @@ MonoBehaviour:
       Data: NMP
     - Name: $v
       Entry: 4
-      Data: 500
+      Data: 1000
     - Name: 
       Entry: 8
       Data: 
@@ -11225,7 +11225,7 @@ MonoBehaviour:
       Data: NEGATIVE_ELECTRODE
     - Name: $v
       Entry: 4
-      Data: 5
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -11331,28 +11331,28 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  mixCoatingProcessingTime: 3
-  mixCoatingLoadingTime: 1
-  pressingProcessingTime: 3
-  pressingLoadingTime: 1
-  stackingProcessingTime: 3
-  stackingLoadingTime: 1
-  testingProcessingTime: 2
+  mixCoatingProcessingTime: 5
+  mixCoatingLoadingTime: 2
+  pressingProcessingTime: 5
+  pressingLoadingTime: 2
+  stackingProcessingTime: 5
+  stackingLoadingTime: 2
+  testingProcessingTime: 3
   testingLoadingTime: 0
   conveyorSpeed: 2
-  inputInterval: 5
-  mixCoatingProcessFailRate: 0
-  mixCoatingProcessFailRateRange: 0
-  pressingProcessFailRate: 0
-  pressingProcessFailRateRange: 0
-  stackingProcessFailRate: 0
-  stackingProcessFailRateRange: 0
+  inputInterval: 7
+  mixCoatingProcessFailRate: 0.1
+  mixCoatingProcessFailRateRange: 0.05
+  pressingProcessFailRate: 0.1
+  pressingProcessFailRateRange: 0.05
+  stackingProcessFailRate: 0.1
+  stackingProcessFailRateRange: 0.05
   MaxLuguageCount: 25
   serverHost: http://192.168.0.102
   resourceManageAPIPort: 30081
   factoryManageAPIPort: 30082
-  cameraSpeed: 0.2
-  zoomSpeed: 0.1
+  cameraSpeed: 0.5
+  zoomSpeed: 0.25
   standAloneMode: 1
   startAtFactoryMode: 1
   isFactorySceneSetting: 1

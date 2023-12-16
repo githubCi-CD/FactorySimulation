@@ -112,7 +112,7 @@ public class WareHouse : SerializedMonoBehaviour
         int idx = 0;
         foreach (GameObject item in NegativeElectrodeBox)
         {
-            if(idx <= boxCount)
+            if(idx < boxCount)
             {
                 item.SetActive(true);
             }

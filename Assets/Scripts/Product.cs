@@ -17,13 +17,12 @@ namespace Assets.Scripts
         public GameObject insideProduct;
 
         private GameObject selfProductGameObject;
-        private Rigidbody  selfProductRigidbody;
+        public Rigidbody  selfProductRigidbody;
 
         private void Awake()
         {
             productId = -1;
             selfProductGameObject = this.gameObject;
-            selfProductRigidbody  = this.gameObject.GetComponentInChildren< Rigidbody >();
         }
 
         public void giveId(long id)
