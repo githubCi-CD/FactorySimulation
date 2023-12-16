@@ -8,7 +8,7 @@ namespace Assets.Scripts
 {
     public class Product : MonoBehaviour
     {
-        [ReadOnly] public int                   productId;
+        [ReadOnly] public long                   productId = -1;
         [ReadOnly] public ProcessResultStatus   isMixingCoating = ProcessResultStatus.NONE;
         [ReadOnly] public ProcessResultStatus   isPressing      = ProcessResultStatus.NONE;
         [ReadOnly] public ProcessResultStatus   isStacking      = ProcessResultStatus.NONE;
@@ -16,13 +16,20 @@ namespace Assets.Scripts
         private GameObject selfProductGameObject;
         private Rigidbody  selfProductRigidbody;
 
-        private void Start()
+        private void Awake()
         {
+            productId = -1;
             selfProductGameObject = this.gameObject;
             selfProductRigidbody  = this.gameObject.GetComponentInChildren< Rigidbody >();
         }
 
-        public int GetProductId()
+        public void giveId(long id)
+        {
+            Debug.Assert(productId == -1);
+            productId = id;
+        }
+
+        public long GetProductId()
         {
             return productId;
         }

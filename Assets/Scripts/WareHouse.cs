@@ -5,7 +5,9 @@ using Assets.Scripts.Config;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
+using static API_DTO;
 
 public class WareHouse : SerializedMonoBehaviour
 {
@@ -35,7 +37,6 @@ public class WareHouse : SerializedMonoBehaviour
             {
                 nowInventory.Add(item.Key, item.Value);
             }
-            APIHandler.Instance.GetStorageInfo(APIType.GET_STORAGE_INFO, factory.GetFactoryId(), 1, ApplyServerRes);
         }
         if (Configration.Instance.standAloneMode == false)
         {
@@ -50,7 +51,6 @@ public class WareHouse : SerializedMonoBehaviour
         UpdateResourceObject();
         StartCoroutine(InputResourceCoroutine());
     }
-
     public bool ApplyServerRes(API_DTO.GetStorageInfoDTO res)
     {
         Debug.Assert(res.factoryId == factory.FactoryId);
@@ -60,21 +60,41 @@ public class WareHouse : SerializedMonoBehaviour
         long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
         long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
         long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
-        if(resOrigin == activeLiquidID)
+        if (resOrigin == activeLiquidID)
         {
             nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] = res.count;
-        }else if(resOrigin == nmpID)
+        }
+        else if (resOrigin == nmpID)
         {
             nowInventory[IngredientType.NMP.ToString()] = res.count;
-        }else if(resOrigin == negativeElectrodeID)
+        }
+        else if (resOrigin == negativeElectrodeID)
         {
             nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] = res.count;
-        }else if(resOrigin == electrolytiIDc)
+        }
+        else if (resOrigin == electrolytiIDc)
         {
             nowInventory[IngredientType.ELECTROLYTIC.ToString()] = res.count;
         }
         UpdateResourceObject();
         return true;
+    }
+
+    public void InputResource()
+    {
+        GameObject newProductObject = Instantiate(ProductObject);
+        newProductObject.transform.SetParent(HeiaraycyProductList.transform);
+        newProductObject.GetComponent<Product>().giveId(factory.IssuanceID());
+        StartConvey.ComeIntoBelt(newProductObject.GetComponent<Product>());
+    }
+
+    IEnumerator InputResourceCoroutine()
+    {
+        while (true)
+        {
+            InputResource();
+            yield return new WaitForSeconds(Configration.Instance.inputInterval);
+        }
     }
 
     public void UpdateResourceObject()
@@ -101,15 +121,6 @@ public class WareHouse : SerializedMonoBehaviour
             }
             idx += 1;
         }
-    }
-
-    public void InputResource()
-    {
-        //새로운 ProductObject인스턴스 생성
-        GameObject newProductObject = Instantiate(ProductObject);
-        //newProductObject를 HeiaraycyProductList 하위에 이동
-        newProductObject.transform.SetParent(HeiaraycyProductList.transform);
-        StartConvey.ComeIntoBelt(newProductObject.GetComponent<Product>());
     }
 
     public bool CheckMixCoatingResource()
@@ -148,17 +159,59 @@ public class WareHouse : SerializedMonoBehaviour
         return true;
     }
 
+    public bool ApplyConsumeResource(ReportStockConsumeDTO afterConsume)
+    {
+        long factoryId = afterConsume.factoryId;
+        long originId = afterConsume.originId;
+        Debug.Assert(factoryId == factory.FactoryId);
+
+        long activeLiquidID = Configration.Instance.OriginNameToID[IngredientType.ACTIVE_LIQUID.ToString()];
+        long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
+        long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
+        long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
+        if (originId == activeLiquidID)
+        {
+            nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] = afterConsume.count;
+        }
+        else if (originId == nmpID)
+        {
+            nowInventory[IngredientType.NMP.ToString()] = afterConsume.count;
+        }
+        else if (originId == negativeElectrodeID)
+        {
+            nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] = afterConsume.count;
+        }
+        else if (originId == electrolytiIDc)
+        {
+            nowInventory[IngredientType.ELECTROLYTIC.ToString()] = afterConsume.count;
+        }
+
+        UpdateResourceObject();
+        return true;
+    }
+
     public void UsingMixCoatingResource(Product product)
     {
         Debug.Assert(product != null);
 
         string activeLiquid = IngredientType.ACTIVE_LIQUID.ToString();
+        long activeLiquidID = Configration.Instance.OriginNameToID[activeLiquid];
         string nmp = IngredientType.NMP.ToString();
+        long nmpID = Configration.Instance.OriginNameToID[nmp];
         float activeLiquidUsage = Configration.Instance.mixCoatingInputResource[activeLiquid];
         float nmpUsage = Configration.Instance.mixCoatingInputResource[nmp];
 
-        nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] -= activeLiquidUsage;
-        nowInventory[IngredientType.NMP.ToString()] -= nmpUsage;
+        if(Configration.Instance.standAloneMode == true)
+        {
+            nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] -= activeLiquidUsage;
+            nowInventory[IngredientType.NMP.ToString()] -= nmpUsage;
+        }
+        else
+        {
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), activeLiquidID, (int)activeLiquidUsage, ApplyConsumeResource);
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), nmpID, (int)nmpUsage, ApplyConsumeResource);
+        }
+
         UpdateResourceObject();
         return;
     }
@@ -168,9 +221,18 @@ public class WareHouse : SerializedMonoBehaviour
         Debug.Assert(product != null);
 
         string negativeElectrode = IngredientType.NEGATIVE_ELECTRODE.ToString();
+        long negativeElectrodeID = Configration.Instance.OriginNameToID[negativeElectrode];
         float negativeElectrodeUsage = Configration.Instance.pressingInputResource[negativeElectrode];
 
-        nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] -= negativeElectrodeUsage;
+        if (Configration.Instance.standAloneMode == true)
+        {
+            nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] -= negativeElectrodeUsage;
+        }
+        else
+        {
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), negativeElectrodeID, (int)negativeElectrodeUsage, ApplyConsumeResource);
+        }
+
         UpdateResourceObject();
         return;
     }
@@ -180,19 +242,19 @@ public class WareHouse : SerializedMonoBehaviour
         Debug.Assert(product != null);
 
         string electrolytic = IngredientType.ELECTROLYTIC.ToString();
-        float electrolyticUsage = Configration.Instance.pressingInputResource[electrolytic];
+        long electrolyticID = Configration.Instance.OriginNameToID[electrolytic];
+        float electrolyticUsage = Configration.Instance.stackingInputResource[electrolytic];
 
-        nowInventory[IngredientType.ELECTROLYTIC.ToString()] -= electrolyticUsage;
+        if (Configration.Instance.standAloneMode == true)
+        {
+            nowInventory[IngredientType.ELECTROLYTIC.ToString()] -= electrolyticUsage;
+        }
+        else
+        {
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), electrolyticID, (int)electrolyticUsage, ApplyConsumeResource);
+        }
+
         UpdateResourceObject();
         return;
-    }
-
-    IEnumerator InputResourceCoroutine()
-    {
-        while (true)
-        {
-            InputResource();
-            yield return new WaitForSeconds(Configration.Instance.inputInterval);
-        }
     }
 }

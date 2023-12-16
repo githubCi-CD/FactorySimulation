@@ -1,4 +1,6 @@
-﻿using Sirenix.OdinInspector;
+﻿using Asset.Script.Backend;
+using Assets.Scripts.Config;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 
@@ -27,15 +29,37 @@ namespace Assets.Scripts
         public bool ShippingLuguage(Product product)
         {
             LuguageCount++;
-            if(LuguageCount == MaxLuguageCount)
+            if (LuguageCount == MaxLuguageCount)
             {
                 TruckDeparture();
             }
-            //정상품 API 호출
 
             isWaiting = true;
-            factory.SellingProduct(product);
+            SellingProduct(product);
             return true;
+        }
+
+        public void SellingProduct(Product product)
+        {
+            if (Configration.Instance.standAloneMode == false)
+            {
+                APIHandler.Instance.ReportProductSell(APIType.REPORT_PRODUCT_SELL, factory.GetFactoryId(), product.GetProductId(), CheckApplySell);
+            }
+            Destroy(product.gameObject);
+        }
+
+        public bool CheckApplySell(API_DTO.ReportProductSellDTO res)
+        {
+            Debug.Assert(res.factoryId == factory.GetFactoryId());
+            if(res.result == (int)ProcessResultStatus.SUCESS)
+            {
+                return true;
+            }
+            else
+            {
+                Debug.Assert(false,"서버에 보고가 누락되었습니다.");
+                return false;
+            }
         }
 
         public void TruckDeparture()

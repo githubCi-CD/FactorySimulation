@@ -41,6 +41,11 @@ namespace Assets.Scripts
         {
             return FactoryId;
         }
+        public long IssuanceID()
+        {
+            ProductCount += 1;
+            return ProductCount;
+        }
 
         private void Start()
         {
@@ -146,12 +151,6 @@ namespace Assets.Scripts
                     break;
             }
             return true;
-        }
-
-        public void SellingProduct(Product product)
-        {
-            wareHouse.InputResource();
-            Destroy(product.gameObject);
         }
 
         public bool CheckNextProductForMachine(Machine machine)

@@ -360,21 +360,21 @@ namespace Asset.Script.Backend
             }
         }
 
-        public void ReportStockConsume(APIType apiType, string factoryName, Func<ReportStockConsumeDTO, bool> afterFunc)
+        public void ReportStockConsume(APIType apiType, long factoryId, long OriginId, int usage, Func<ReportStockConsumeDTO, bool> afterFunc)
         {
             Debug.Assert(apiType == APIType.REPORT_STOCK_CONSUME);
             Debug.Assert(afterFunc != null);
-            StartCoroutine(ReportStockConsumeCorutine(factoryName, (ReportStockConsumeDTO res) =>
+            StartCoroutine(ReportStockConsumeCorutine(factoryId, OriginId, usage, (ReportStockConsumeDTO res) =>
             {
                 afterFunc(res);
             }));
         }
 
-        IEnumerator ReportStockConsumeCorutine(string factoryName, Action<ReportStockConsumeDTO> callback)
+        IEnumerator ReportStockConsumeCorutine(long factoryId, long OriginId, int usage, Action<ReportStockConsumeDTO> callback)
         {
             string host = Configration.Instance.serverHost;
             string port = Configration.Instance.factoryManageAPIPort;
-            string url = host + ":" + port + "/factory/connect?factoryName=" + factoryName;
+            string url = host + ":" + port + "/factory/connect?factoryId=" + factoryId + "&OriginId=" + OriginId + "&usage=" + usage;
 
             bool serverTest = true;
             yield return StartCoroutine(CheckConnectionCorutine((bool res) =>
@@ -411,21 +411,21 @@ namespace Asset.Script.Backend
             }
         }
 
-        public void ReportProductSell(APIType apiType, string factoryName, Func<ReportProductSellDTO, bool> afterFunc)
+        public void ReportProductSell(APIType apiType, long factoryId, long productId, Func<ReportProductSellDTO, bool> afterFunc)
         {
             Debug.Assert(apiType == APIType.REPORT_PRODUCT_SELL);
             Debug.Assert(afterFunc != null);
-            StartCoroutine(ReportProductSellCorutine(factoryName, (ReportProductSellDTO res) =>
+            StartCoroutine(ReportProductSellCorutine(factoryId, productId, (ReportProductSellDTO res) =>
             {
                 afterFunc(res);
             }));
         }
 
-        IEnumerator ReportProductSellCorutine(string factoryName, Action<ReportProductSellDTO> callback)
+        IEnumerator ReportProductSellCorutine(long factoryId, long productId, Action<ReportProductSellDTO> callback)
         {
             string host = Configration.Instance.serverHost;
             string port = Configration.Instance.factoryManageAPIPort;
-            string url = host + ":" + port + "/factory/connect?factoryName=" + factoryName;
+            string url = host + ":" + port + "/factory/sell?factoryId=" + factoryId.ToString() + "&productId=" + productId.ToString();
 
             bool serverTest = true;
             yield return StartCoroutine(CheckConnectionCorutine((bool res) =>

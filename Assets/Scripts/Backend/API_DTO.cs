@@ -103,8 +103,8 @@ public class API_DTO : MonoBehaviour
     public class ReportProductSellDTO
     {
         public long factoryId;
-        public long productId;
-        public int count;
+        public long ProductId;
+        public int result;
     }
 
     ///<summary>

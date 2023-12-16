@@ -99,6 +99,8 @@ namespace Assets.Scripts.Config
             machineStatus       = MachineStatus.LOADING;
             nowProduct          = product;
             nowProcessingTime   = 0;
+            if(machineType != MachineType.TEST_MACHINE)
+                factory.UseResourceFromWareHouse(machineType, product);
             StartCoroutine(MachineTakeTime(loadingTime, "로딩", ProcessMachine));
             return true;
         }
