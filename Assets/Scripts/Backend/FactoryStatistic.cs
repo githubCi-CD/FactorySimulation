@@ -47,6 +47,6 @@ public class FactoryStatistic : MonoBehaviour
         TestFailCount += 1;
     }
 
-    public void AccmulateActiveLiquid(FlagsAttribute )
+    
 
 }

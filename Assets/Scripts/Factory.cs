@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Config;
+﻿using Asset.Script.Backend;
+using Assets.Scripts.Config;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using TMPro;
@@ -10,9 +11,9 @@ namespace Assets.Scripts
     public class Factory : SerializedMonoBehaviour
     {
         [Header("FactoryMetaData")]
-        public int FactoryId = -1;
-        public string FactoryName;
-        [ReadOnly] public int ProductCount;
+        [ReadOnly] public long FactoryId = -1;
+        [ReadOnly] public string FactoryName;
+        [ReadOnly] public long ProductCount;
 
         [Header("Inventory")]
         [ReadOnly] public WareHouse wareHouse;
@@ -27,6 +28,8 @@ namespace Assets.Scripts
         [Header("Processing Console")]
         [ReadOnly] public List<ProductQueue> productQueues = new List<ProductQueue>();
 
+        public APIHandler apiHandler;
+
         static ProductQueue MinQueue(ProductQueue x, ProductQueue y)
         {
             if (x == null) return y;
@@ -34,8 +37,25 @@ namespace Assets.Scripts
             return (x.GetWaitingProductCount() < y.GetWaitingProductCount()) ? x : y;
         }
 
+        public long GetFactoryId()
+        {
+            return FactoryId;
+        }
+
         private void Start()
         {
+            if (Configration.Instance.startAtFactoryMode == false)
+            {
+                FactoryId = Configration.Instance.factoryId;
+                FactoryName = Configration.Instance.factoryName;
+                ProductCount = Configration.Instance.totalCount;
+            }
+            else
+            {
+                FactoryId = 1;
+                FactoryName = "TestFactory";
+                ProductCount = 0;
+            }
             int IDStart = 1; 
             foreach (var machine in machines)
             {

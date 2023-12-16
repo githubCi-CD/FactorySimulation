@@ -8,6 +8,10 @@ public class Configration : SerializedMonoBehaviour
     private static Configration instance;
     private void Awake()
     {
+        if(isFactorySceneSetting == true && startAtFactoryMode == false)
+        {
+            Destroy(this.gameObject);
+        }
         if (null == instance)
         {
             instance = this;
@@ -32,7 +36,6 @@ public class Configration : SerializedMonoBehaviour
         }
     }
 
-
     [Header("Machine Setting")]
     public float mixCoatingProcessingTime;
     public float mixCoatingLoadingTime;
@@ -53,6 +56,7 @@ public class Configration : SerializedMonoBehaviour
     public Dictionary<string, float> mixCoatingInputResource = new Dictionary<string, float>();
     public Dictionary<string, float> pressingInputResource = new Dictionary<string, float>();
     public Dictionary<string, float> stackingInputResource = new Dictionary<string, float>();
+    public Dictionary<string, int> OriginNameToID = new Dictionary<string, int>();
 
     [Header("Statistic Setting")]
     public float mixCoatingProcessFailRate;
@@ -66,7 +70,19 @@ public class Configration : SerializedMonoBehaviour
     public int MaxLuguageCount = 25;
 
     [Header("Server Setting")]
-    public string serverHost = "http://192.168.0.102:";
+    public string serverHost = "http://192.168.0.102";
     public string resourceManageAPIPort = "30081";
     public string factoryManageAPIPort = "30082";
+
+    [Header("Development Setting")]
+    public bool standAloneMode;
+    public bool startAtFactoryMode;
+    public bool isFactorySceneSetting;
+
+    [HideInInspector]
+    public long factoryId;
+    [HideInInspector]
+    public string factoryName;
+    [HideInInspector]
+    public long totalCount;
 }

@@ -1,3 +1,4 @@
+using Asset.Script.Backend;
 using Assets;
 using Assets.Scripts;
 using Assets.Scripts.Config;
@@ -15,11 +16,13 @@ public class WareHouse : SerializedMonoBehaviour
     public Dictionary<string, GameObject> LiquidResourceObject = new Dictionary<string, GameObject>();
     public GameObject[] NegativeElectrodeBox;
     [ReadOnly] public Dictionary<string, float> nowInventory = new Dictionary<string, float>();
+    [ReadOnly] public Factory factory;
 
     private void Start()
     {
+        factory = GameObject.FindWithTag("Factory").GetComponent<Factory>();
         // nowInventory¿¡ Init Inventory º¹»ç
-        foreach (KeyValuePair<string,float> item in Configration.Instance.init_Inventory)
+        foreach (KeyValuePair<string, float> item in Configration.Instance.init_Inventory)
         {
             if (nowInventory.ContainsKey(item.Key))
             {
@@ -32,9 +35,46 @@ public class WareHouse : SerializedMonoBehaviour
             {
                 nowInventory.Add(item.Key, item.Value);
             }
+            APIHandler.Instance.GetStorageInfo(APIType.GET_STORAGE_INFO, factory.GetFactoryId(), 1, ApplyServerRes);
         }
+        if (Configration.Instance.standAloneMode == false)
+        {
+            long activeLiquidID = Configration.Instance.OriginNameToID[IngredientType.ACTIVE_LIQUID.ToString()];
+            long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
+            long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
+            long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
+            APIHandler.Instance.GetStorageInfo(APIType.GET_STORAGE_INFO, factory.GetFactoryId(), activeLiquidID, ApplyServerRes);
+        }
+
+
         UpdateResourceObject();
         StartCoroutine(InputResourceCoroutine());
+    }
+
+    public bool ApplyServerRes(API_DTO.GetStorageInfoDTO res)
+    {
+        Debug.Assert(res.factoryId == factory.FactoryId);
+        long resOrigin = res.originId;
+
+        long activeLiquidID = Configration.Instance.OriginNameToID[IngredientType.ACTIVE_LIQUID.ToString()];
+        long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
+        long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
+        long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
+        if(resOrigin == activeLiquidID)
+        {
+            nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] = res.count;
+        }else if(resOrigin == nmpID)
+        {
+            nowInventory[IngredientType.NMP.ToString()] = res.count;
+        }else if(resOrigin == negativeElectrodeID)
+        {
+            nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] = res.count;
+        }else if(resOrigin == electrolytiIDc)
+        {
+            nowInventory[IngredientType.ELECTROLYTIC.ToString()] = res.count;
+        }
+        UpdateResourceObject();
+        return true;
     }
 
     public void UpdateResourceObject()

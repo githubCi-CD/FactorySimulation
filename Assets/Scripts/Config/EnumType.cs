@@ -47,4 +47,5 @@ namespace Assets.Scripts.Config
         SUCESS = 1,
         FAIL = 0
     }
+
 }

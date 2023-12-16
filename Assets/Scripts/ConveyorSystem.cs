@@ -23,7 +23,9 @@ namespace Assets
         private void Start()
         {
             Speed = Configration.Instance.conveyorSpeed;
-
+        }
+        public void conveyorPointSetting()
+        {
             pointCount = movingLineRenderer.positionCount;
             localPoints = new Vector3[pointCount];
             movingLineRenderer.GetPositions(localPoints);
@@ -33,7 +35,10 @@ namespace Assets
         public void ComeIntoBelt(Product product)
         {
             Debug.Assert(product != null);
-
+            if(localPoints == null)
+            {
+                conveyorPointSetting();
+            }
             product.gameObject.transform.position = localPoints[StartIndex];
             StartCoroutine(moveFollowLine(product.gameObject, StartIndex, WaitingIndex));
         }
@@ -49,7 +54,10 @@ namespace Assets
         public void ShippingToTruck(Product product)
         {
             Debug.Assert(product != null);
-
+            if (localPoints == null)
+            {
+                conveyorPointSetting();
+            }
             product.gameObject.transform.position = localPoints[StartIndex];
             StartCoroutine(moveFollowLine(product.gameObject, StartIndex, EndIndex));
         }
