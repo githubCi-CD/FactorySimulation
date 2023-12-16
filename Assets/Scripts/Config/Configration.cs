@@ -74,6 +74,10 @@ public class Configration : SerializedMonoBehaviour
     public string resourceManageAPIPort = "30081";
     public string factoryManageAPIPort = "30082";
 
+    [Header("Monitoring Setting")]
+    public float cameraSpeed = 1.0f;
+    public float zoomSpeed = 1.0f;
+
     [Header("Development Setting")]
     public bool standAloneMode;
     public bool startAtFactoryMode;

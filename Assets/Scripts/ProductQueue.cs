@@ -74,6 +74,7 @@ namespace Assets.Scripts
         {
             Debug.Assert(product != null);
             products.Add(product);
+            targetMachine.UpdateWaitingText();
         }
 
         public Machine GetTargetMachine()

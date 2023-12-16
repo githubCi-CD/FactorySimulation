@@ -5,32 +5,13 @@ using UnityEngine;
 
 public class FactoryStatistic : MonoBehaviour
 {
-
-    [ReadOnly] public int ProductID;
-    [ReadOnly] public int ProductStartCount;
-    [ReadOnly] public int TestSuccessCount;
-    [ReadOnly] public int TestFailCount;
-    [ReadOnly] public Dictionary<string, float> MaterialUsage= new Dictionary<string, float>()
-    {
-        { "ActiveLiquid", 0 },
-        { "NMP", 0 },
-        { "NegativeElectrode", 0 },
-        { "Electrolytic", 0 },
-    };
-
-    private void InitFactoryStatistic(int ProductID, int ProductStartCount, int TestSuccessCount, int TestFailCount)
-    {
-        this.ProductID = ProductID;
-        this.ProductStartCount = ProductStartCount;
-        this.TestSuccessCount = TestSuccessCount;
-        this.TestFailCount = TestFailCount;
-    }
-
-    public int GiveProductID()
-    {
-        ProductID += 1;
-        return ProductID;
-    }
+    [ReadOnly] public int ProductStartCount = 0;
+    [ReadOnly] public int TestSuccessCount = 0;
+    [ReadOnly] public int TestFailCount = 0;
+    [ReadOnly] public float UsageActiveLiquidCount = 0;
+    [ReadOnly] public float UsageNPMCount = 0;
+    [ReadOnly] public float UsageNegativeElectrodeCount = 0;
+    [ReadOnly] public float UsageElectrolyticCount = 0;
 
     public void AddProductStartCount()
     {
@@ -47,6 +28,23 @@ public class FactoryStatistic : MonoBehaviour
         TestFailCount += 1;
     }
 
-    
+    public void AddUsageActiveLiquidCount(float usage)
+    {
+        UsageActiveLiquidCount += usage;
+    }
 
+    public void AddUsageNPMCount(float usage)
+    {
+        UsageNPMCount += usage;
+    }
+
+    public void AddUsageNegativeElectrodeCount(float usage)
+    {
+        UsageNegativeElectrodeCount += usage;
+    }
+
+    public void AddUsageElectrolyticCount(float usage)
+    {
+        UsageElectrolyticCount += usage;
+    }
 }

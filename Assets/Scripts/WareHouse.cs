@@ -85,6 +85,7 @@ public class WareHouse : SerializedMonoBehaviour
         GameObject newProductObject = Instantiate(ProductObject);
         newProductObject.transform.SetParent(HeiaraycyProductList.transform);
         newProductObject.GetComponent<Product>().giveId(factory.IssuanceID());
+        factory.StatisticArchive(statisticType.PRODUCT_START_COUNT);
         StartConvey.ComeIntoBelt(newProductObject.GetComponent<Product>());
     }
 
@@ -201,7 +202,10 @@ public class WareHouse : SerializedMonoBehaviour
         float activeLiquidUsage = Configration.Instance.mixCoatingInputResource[activeLiquid];
         float nmpUsage = Configration.Instance.mixCoatingInputResource[nmp];
 
-        if(Configration.Instance.standAloneMode == true)
+        factory.StatisticArchive(statisticType.MATERIAL_USAGE_ACTIVE_LIQUID, activeLiquidUsage);
+        factory.StatisticArchive(statisticType.MATERIAL_USAGE_NMP, nmpUsage);
+
+        if (Configration.Instance.standAloneMode == true)
         {
             nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] -= activeLiquidUsage;
             nowInventory[IngredientType.NMP.ToString()] -= nmpUsage;
@@ -224,6 +228,8 @@ public class WareHouse : SerializedMonoBehaviour
         long negativeElectrodeID = Configration.Instance.OriginNameToID[negativeElectrode];
         float negativeElectrodeUsage = Configration.Instance.pressingInputResource[negativeElectrode];
 
+        factory.StatisticArchive(statisticType.MATERIAL_USAGE_NEGATIVE_ELECTRODE, negativeElectrodeUsage);
+
         if (Configration.Instance.standAloneMode == true)
         {
             nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] -= negativeElectrodeUsage;
@@ -244,6 +250,8 @@ public class WareHouse : SerializedMonoBehaviour
         string electrolytic = IngredientType.ELECTROLYTIC.ToString();
         long electrolyticID = Configration.Instance.OriginNameToID[electrolytic];
         float electrolyticUsage = Configration.Instance.stackingInputResource[electrolytic];
+
+        factory.StatisticArchive(statisticType.MATERIAL_USAGE_ELECTROLYTIC, electrolyticUsage);
 
         if (Configration.Instance.standAloneMode == true)
         {

@@ -28,7 +28,11 @@ namespace Assets.Scripts
         [Header("Processing Console")]
         [ReadOnly] public List<ProductQueue> productQueues = new List<ProductQueue>();
 
+        [Header("Visualize Asset")]
+        public Dictionary<string, Material> machineVisualizeMaterial = new Dictionary<string, Material>();
+
         public APIHandler apiHandler;
+        public FactoryStatistic factoryStatistic;
 
         static ProductQueue MinQueue(ProductQueue x, ProductQueue y)
         {
@@ -69,6 +73,38 @@ namespace Assets.Scripts
             }
             truck = GameObject.FindWithTag("Truck").GetComponent<Truck>();
             wareHouse = GameObject.FindWithTag("Warehouse").GetComponent<WareHouse>();
+            factoryStatistic = GetComponent<FactoryStatistic>();
+        }
+
+        public void StatisticArchive(statisticType type, float value = 0)
+        {
+            switch(type)
+            {
+                case statisticType.PRODUCT_START_COUNT:
+                    factoryStatistic.AddProductStartCount();
+                    break;
+                case statisticType.PRODUCT_TEST_SUCCESS_COUNT:
+                    factoryStatistic.AddProductTestSuccessCount();
+                    break;
+                case statisticType.PRODUCT_TEST_FAIL_COUNT:
+                    factoryStatistic.AddProductTestFailCount();
+                    break;
+                case statisticType.MATERIAL_USAGE_ACTIVE_LIQUID:
+                    factoryStatistic.AddUsageActiveLiquidCount(value);
+                    break;
+                case statisticType.MATERIAL_USAGE_NMP:
+                    factoryStatistic.AddUsageNPMCount(value);
+                    break;
+                case statisticType.MATERIAL_USAGE_NEGATIVE_ELECTRODE:
+                    factoryStatistic.AddUsageNegativeElectrodeCount(value);
+                    break;
+                case statisticType.MATERIAL_USAGE_ELECTROLYTIC:
+                    factoryStatistic.AddUsageElectrolyticCount(value);
+                    break;
+                default:
+                    Debug.Assert(false, "알수없는 통계 종류입니다.");
+                    break;
+            }
         }
 
         public ProductQueue GetMachineQueueByID(int machineID)

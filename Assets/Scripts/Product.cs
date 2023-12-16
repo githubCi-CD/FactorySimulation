@@ -12,6 +12,9 @@ namespace Assets.Scripts
         [ReadOnly] public ProcessResultStatus   isMixingCoating = ProcessResultStatus.NONE;
         [ReadOnly] public ProcessResultStatus   isPressing      = ProcessResultStatus.NONE;
         [ReadOnly] public ProcessResultStatus   isStacking      = ProcessResultStatus.NONE;
+        public Material[] processGameObj;
+        public GameObject finalBattery;
+        public GameObject insideProduct;
 
         private GameObject selfProductGameObject;
         private Rigidbody  selfProductRigidbody;
@@ -64,12 +67,16 @@ namespace Assets.Scripts
             switch(processType)
             {
                 case MachineType.MIXCOATING_MACHINE:
+                    insideProduct.GetComponent<MeshRenderer>().material = processGameObj[0];
                     isMixingCoating = (isSucceed ? ProcessResultStatus.SUCESS : ProcessResultStatus.FAIL);
                     break;
                 case MachineType.PRESS_MACHINE:
+                    insideProduct.GetComponent<MeshRenderer>().material = processGameObj[1];
                     isPressing = (isSucceed ? ProcessResultStatus.SUCESS : ProcessResultStatus.FAIL);
                     break;
                 case MachineType.STACK_MACHINE:
+                    insideProduct.SetActive(false);
+                    finalBattery.SetActive(true);
                     isStacking = (isSucceed ? ProcessResultStatus.SUCESS : ProcessResultStatus.FAIL);
                     break;
                 case MachineType.TEST_MACHINE:

@@ -16,6 +16,7 @@ namespace Assets.Scripts
         private Factory factory;
         private bool isWaiting = true;
         private ProductQueue truckProductQueue;
+        public AnimationClip DepartureClip;
 
         private void Start()
         {
@@ -69,8 +70,16 @@ namespace Assets.Scripts
             Debug.Log("Truck Departure");
             //트럭출발 애니메이션
 
-            //애니메이션 이후 다시 코루틴 시작
+            StartCoroutine(TruckAnime());
             return;
+        }
+
+        IEnumerator TruckAnime()
+        {
+            Animation anime = gameObject.GetComponent<Animation>();
+            anime.Play(DepartureClip.name);
+            yield return new WaitForSeconds(DepartureClip.length);
+            StartCoroutine(WaitingLauguage());
         }
 
         IEnumerator WaitingLauguage()

@@ -48,4 +48,26 @@ namespace Assets.Scripts.Config
         FAIL = 0
     }
 
+    public enum CCTVBtn_type
+    {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
+        ZOOM_IN,
+        ZOOM_OUT
+    }
+
+    public enum statisticType
+    {
+        NONE,
+        PRODUCT_START_COUNT,
+        PRODUCT_TEST_SUCCESS_COUNT,
+        PRODUCT_TEST_FAIL_COUNT,
+        MATERIAL_USAGE_ACTIVE_LIQUID,
+        MATERIAL_USAGE_NMP,
+        MATERIAL_USAGE_NEGATIVE_ELECTRODE,
+        MATERIAL_USAGE_ELECTROLYTIC
+    }
+
 }

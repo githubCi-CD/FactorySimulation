@@ -1,6 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -24,11 +25,47 @@ namespace Assets.Scripts.Config
         public MachineStatus    machineStatus = 0;
         public Product          nowProduct;
         public float            nowProcessingTime = 0;
+        public TextMeshProUGUI  machineWaitingText;
+
+        [Header("Machine Animation Asset")]
+        public GameObject RedLightObj;
+        public GameObject BlueLightObj;
+        private MeshRenderer     RedLight;
+        private MeshRenderer     BlueLight;
+
+        public void UpdateMachineLightByStatus(MachineStatus status)
+        {
+            if (machineType == MachineType.TEST_MACHINE || machineType == MachineType.SHIPPING_TRUCK)
+                return;
+            switch (status)
+            {
+                case MachineStatus.WAITING:
+                    RedLight.material = factory.machineVisualizeMaterial["BLACK"];
+                    BlueLight.material = factory.machineVisualizeMaterial["BLUE"];
+                    break;
+                case MachineStatus.LOADING:
+                    RedLight.material = factory.machineVisualizeMaterial["RED"];
+                    BlueLight.material = factory.machineVisualizeMaterial["BLUE"];
+                    break;
+                case MachineStatus.PROCESSING:
+                    RedLight.material = factory.machineVisualizeMaterial["RED"];
+                    BlueLight.material = factory.machineVisualizeMaterial["BLACK"];
+                    break;
+                case MachineStatus.UNLOADING:
+                    RedLight.material = factory.machineVisualizeMaterial["BLACK"];
+                    BlueLight.material = factory.machineVisualizeMaterial["BLACK"];
+                    break;
+            }
+        }
 
         [HideInInspector]
         private Factory         factory;
         private void Start()
         {
+            if(RedLightObj != null)
+                RedLight = RedLightObj.GetComponent<MeshRenderer>();
+            if(BlueLightObj != null)
+                BlueLight = BlueLightObj.GetComponent<MeshRenderer>();
             switch (machineType)
             {
                 case MachineType.MIXCOATING_MACHINE:
@@ -78,6 +115,16 @@ namespace Assets.Scripts.Config
         {
             return targetTruck;
         }
+        public void UpdateWaitingText()
+        {
+            if(machineType == MachineType.SHIPPING_TRUCK)
+            {
+                return;
+            }
+            ProductQueue pq =  factory.GetMachineQueueByID(machineID);
+            machineWaitingText.text = pq.GetWaitingProductCount().ToString();
+        }
+
         private bool isTruckWaiting()
         {
             return isUnshippable;
@@ -97,9 +144,11 @@ namespace Assets.Scripts.Config
         public bool LoadingMachine(Product product)
         {
             machineStatus       = MachineStatus.LOADING;
+            UpdateMachineLightByStatus(machineStatus);
             nowProduct          = product;
             nowProcessingTime   = 0;
-            if(machineType != MachineType.TEST_MACHINE)
+            UpdateWaitingText();
+            if (machineType != MachineType.TEST_MACHINE)
                 factory.UseResourceFromWareHouse(machineType, product);
             StartCoroutine(MachineTakeTime(loadingTime, "로딩", ProcessMachine));
             return true;
@@ -109,6 +158,7 @@ namespace Assets.Scripts.Config
         {
             Debug.Assert(machineType != MachineType.UNKNOWN_ERROR, "알수없는 기계의 종류입니다.");
             machineStatus       = MachineStatus.PROCESSING;
+            UpdateMachineLightByStatus(machineStatus);
 
             StartCoroutine(MachineTakeTime(processingTime, machineType.ToString(), CompleteMachine));
 
@@ -130,6 +180,7 @@ namespace Assets.Scripts.Config
                 return false;
             }
             machineStatus = MachineStatus.WAITING;
+            UpdateMachineLightByStatus(machineStatus);
             StartCoroutine(WaitingNextProduct());
             return true;
         }
@@ -137,6 +188,7 @@ namespace Assets.Scripts.Config
         public void UnloadingMachine()
         {
             machineStatus = MachineStatus.UNLOADING;
+            UpdateMachineLightByStatus(machineStatus);
             StartCoroutine(WaitingResourceFromWarehouse(WaitingLoad));
         }
 
@@ -148,9 +200,12 @@ namespace Assets.Scripts.Config
                 bool isGood = nowProduct.isGoodProduct();
                 if (isGood == false)
                 {
+                    factory.StatisticArchive(statisticType.PRODUCT_TEST_FAIL_COUNT);
                     nowProduct.WasteProduct();
                 }
                 factory.TestProcessComplete(isGood, nowProduct);
+                factory.StatisticArchive(statisticType.PRODUCT_TEST_SUCCESS_COUNT);
+                StartCoroutine(DisplayTestResult(isGood));
                 WaitingLoad();
                 return true;
             }
@@ -187,6 +242,7 @@ namespace Assets.Scripts.Config
                     machineStatus = MachineStatus.LOADING;
                     break;
                 }
+                UpdateWaitingText();
                 yield return new WaitForEndOfFrame();
             }
             yield return null;
@@ -203,6 +259,21 @@ namespace Assets.Scripts.Config
                 }
                 yield return new WaitForSeconds(1);
             }
+            yield return null;
+        }
+
+        IEnumerator DisplayTestResult(bool result)
+        {
+            if(result == true)
+            {
+                RedLight.material = factory.machineVisualizeMaterial["BLUE"];
+            }
+            else
+            {
+                RedLight.material = factory.machineVisualizeMaterial["RED"];
+            }
+            yield return new WaitForSeconds(1.5f);
+            RedLight.material = factory.machineVisualizeMaterial["BLACK"];
             yield return null;
         }
     }
