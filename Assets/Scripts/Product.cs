@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -17,6 +18,7 @@ namespace Assets.Scripts
         public GameObject insideProduct;
 
         private GameObject selfProductGameObject;
+        private Guid       selfProductGuid;
         public Rigidbody  selfProductRigidbody;
 
         private void Awake()
@@ -28,16 +30,24 @@ namespace Assets.Scripts
         public void giveId(long id)
         {
             Debug.Assert(productId == -1);
+            Guid guid = Guid.NewGuid();
+            selfProductGuid = guid;
             productId = id;
+        }
+
+        public Guid GetProductGuid()
+        {
+            return selfProductGuid;
+        }
+
+        public void initProductGuid(Guid guid)
+        {
+            selfProductGuid = guid;
         }
 
         public long GetProductId()
         {
             return productId;
-        }
-        public void initProductId(int id)
-        {
-            productId = id;
         }
 
         public GameObject GetProductGameObject()
@@ -45,13 +55,15 @@ namespace Assets.Scripts
             return selfProductGameObject;
         }
 
-        public bool isGoodProduct()
+        public ProcessType isGoodProduct()
         {
-            return (
-                    isMixingCoating == ProcessResultStatus.SUCESS &&
-                    isPressing == ProcessResultStatus.SUCESS &&
-                    isStacking == ProcessResultStatus.SUCESS
-                );
+            if (isMixingCoating == ProcessResultStatus.FAIL)
+                return ProcessType.MIXCOATING;
+            else if (isPressing == ProcessResultStatus.FAIL)
+                return ProcessType.PRESSING;
+            else if (isStacking == ProcessResultStatus.FAIL)
+                return ProcessType.STACKING;
+            return ProcessType.NONE;
         }
 
         public void WasteProduct()

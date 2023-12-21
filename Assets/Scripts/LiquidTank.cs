@@ -18,6 +18,10 @@ public class LiquidTank : MonoBehaviour
         float nowInsideScaleXZ = TankInside.transform.localScale.z;
         float maxInsideTankHeight = nowInsideScaleXZ;
         float nowInsideTankHeight = maxInsideTankHeight * (now_tank / max_tank);
+        if (nowInsideTankHeight > maxInsideTankHeight) 
+        {
+            nowInsideTankHeight = maxInsideTankHeight;
+        }
         TankInside.transform.localScale = new Vector3(nowInsideScaleXZ, nowInsideTankHeight, nowInsideScaleXZ);
 
         float heightOffset = (tankHeight - nowInsideTankHeight) / 4;

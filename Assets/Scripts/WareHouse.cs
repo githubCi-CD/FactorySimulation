@@ -14,6 +14,7 @@ public class WareHouse : SerializedMonoBehaviour
     public ConveyorSystem StartConvey;
     public GameObject ProductObject;
     public GameObject HeiaraycyProductList;
+    public Machine FirstInputMachine;
 
     public Dictionary<string, GameObject> LiquidResourceObject = new Dictionary<string, GameObject>();
     public GameObject[] NegativeElectrodeBox;
@@ -44,48 +45,77 @@ public class WareHouse : SerializedMonoBehaviour
             long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
             long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
             long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
-            APIHandler.Instance.GetStorageInfo(APIType.GET_STORAGE_INFO, factory.GetFactoryId(), activeLiquidID, ApplyServerRes);
+            APIHandler.Instance.GetStorageInfo(APIType.GET_STORAGE_INFO, factory.GetFactoryId(), ApplyServerRes);
         }
 
 
         UpdateResourceObject();
         StartCoroutine(InputResourceCoroutine());
+        StartCoroutine(PeriodicStorageUpdate());
     }
     public bool ApplyServerRes(API_DTO.GetStorageInfoDTO res)
     {
-        Debug.Assert(res.factoryId == factory.FactoryId);
-        long resOrigin = res.originId;
+        if(res == null)
+        {
+            SetZeroNowInventory();
+            return false;
+        }
 
         long activeLiquidID = Configration.Instance.OriginNameToID[IngredientType.ACTIVE_LIQUID.ToString()];
         long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
         long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
         long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
-        if (resOrigin == activeLiquidID)
+
+        foreach (StorageOrigin stock in res.storageList)
         {
-            nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] = res.count;
-        }
-        else if (resOrigin == nmpID)
-        {
-            nowInventory[IngredientType.NMP.ToString()] = res.count;
-        }
-        else if (resOrigin == negativeElectrodeID)
-        {
-            nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] = res.count;
-        }
-        else if (resOrigin == electrolytiIDc)
-        {
-            nowInventory[IngredientType.ELECTROLYTIC.ToString()] = res.count;
+            Debug.Assert(stock.factoryId == factory.GetFactoryId());
+            if (stock.origin.id == activeLiquidID)
+            {
+                nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] = stock.count;
+            }
+            else if (stock.origin.id == nmpID)
+            {
+                nowInventory[IngredientType.NMP.ToString()] = stock.count;
+            }
+            else if (stock.origin.id == negativeElectrodeID)
+            {
+                nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] = stock.count;
+            }
+            else if (stock.origin.id == electrolytiIDc)
+            {
+                nowInventory[IngredientType.ELECTROLYTIC.ToString()] = stock.count;
+            }
         }
         UpdateResourceObject();
         return true;
+    }
+
+    public void SetZeroNowInventory()
+    {
+          foreach (KeyValuePair<string, float> item in Configration.Instance.init_Inventory)
+        {
+            if (nowInventory.ContainsKey(item.Key))
+            {
+                if (nowInventory[item.Key] != 0)
+                {
+                    nowInventory[item.Key] = 0;
+                }
+            }
+            else
+            {
+                nowInventory.Add(item.Key, 0);
+            }
+        }   
     }
 
     public void InputResource()
     {
         GameObject newProductObject = Instantiate(ProductObject);
         newProductObject.transform.SetParent(HeiaraycyProductList.transform);
-        newProductObject.GetComponent<Product>().giveId(factory.IssuanceID());
+        Product newProduct = newProductObject.GetComponent<Product>();
+        newProduct.giveId(factory.IssuanceID());
         factory.StatisticArchive(statisticType.PRODUCT_START_COUNT);
+        APIHandler.Instance.LogProduceProduct(LOGType.PRODUCT_START, newProduct.GetProductGuid(), factory.GetFactoryId(), newProduct.GetProductId());
         StartConvey.ComeIntoBelt(newProductObject.GetComponent<Product>());
     }
 
@@ -93,7 +123,10 @@ public class WareHouse : SerializedMonoBehaviour
     {
         while (true)
         {
-            InputResource();
+            if(FirstInputMachine.GetMachineStatus() == MachineStatus.WAITING)
+            {
+                InputResource();
+            }
             yield return new WaitForSeconds(Configration.Instance.inputInterval);
         }
     }
@@ -160,36 +193,6 @@ public class WareHouse : SerializedMonoBehaviour
         return true;
     }
 
-    public bool ApplyConsumeResource(ReportStockConsumeDTO afterConsume)
-    {
-        long factoryId = afterConsume.factoryId;
-        long originId = afterConsume.originId;
-        Debug.Assert(factoryId == factory.FactoryId);
-
-        long activeLiquidID = Configration.Instance.OriginNameToID[IngredientType.ACTIVE_LIQUID.ToString()];
-        long nmpID = Configration.Instance.OriginNameToID[IngredientType.NMP.ToString()];
-        long negativeElectrodeID = Configration.Instance.OriginNameToID[IngredientType.NEGATIVE_ELECTRODE.ToString()];
-        long electrolytiIDc = Configration.Instance.OriginNameToID[IngredientType.ELECTROLYTIC.ToString()];
-        if (originId == activeLiquidID)
-        {
-            nowInventory[IngredientType.ACTIVE_LIQUID.ToString()] = afterConsume.count;
-        }
-        else if (originId == nmpID)
-        {
-            nowInventory[IngredientType.NMP.ToString()] = afterConsume.count;
-        }
-        else if (originId == negativeElectrodeID)
-        {
-            nowInventory[IngredientType.NEGATIVE_ELECTRODE.ToString()] = afterConsume.count;
-        }
-        else if (originId == electrolytiIDc)
-        {
-            nowInventory[IngredientType.ELECTROLYTIC.ToString()] = afterConsume.count;
-        }
-
-        UpdateResourceObject();
-        return true;
-    }
 
     public void UsingMixCoatingResource(Product product)
     {
@@ -204,6 +207,8 @@ public class WareHouse : SerializedMonoBehaviour
 
         factory.StatisticArchive(statisticType.MATERIAL_USAGE_ACTIVE_LIQUID, activeLiquidUsage);
         factory.StatisticArchive(statisticType.MATERIAL_USAGE_NMP, nmpUsage);
+        APIHandler.Instance.OriginUsageMaterial(LOGType.ORIGIN_USAGE_ACTIVE_LIQUID, IngredientType.ACTIVE_LIQUID, product.GetProductGuid(), factory.GetFactoryId(), product.GetProductId(), activeLiquidUsage.ToString());
+        APIHandler.Instance.OriginUsageMaterial(LOGType.ORIGIN_USAGE_NMP, IngredientType.NMP, product.GetProductGuid(), factory.GetFactoryId(), product.GetProductId(), nmpUsage.ToString());
 
         if (Configration.Instance.standAloneMode == true)
         {
@@ -212,8 +217,8 @@ public class WareHouse : SerializedMonoBehaviour
         }
         else
         {
-            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), activeLiquidID, (int)activeLiquidUsage, ApplyConsumeResource);
-            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), nmpID, (int)nmpUsage, ApplyConsumeResource);
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), activeLiquidID, (int)activeLiquidUsage);
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), nmpID, (int)nmpUsage);
         }
 
         UpdateResourceObject();
@@ -229,6 +234,7 @@ public class WareHouse : SerializedMonoBehaviour
         float negativeElectrodeUsage = Configration.Instance.pressingInputResource[negativeElectrode];
 
         factory.StatisticArchive(statisticType.MATERIAL_USAGE_NEGATIVE_ELECTRODE, negativeElectrodeUsage);
+        APIHandler.Instance.OriginUsageMaterial(LOGType.ORIGIN_USAGE_NEGATIVE_ELECTRODE, IngredientType.NEGATIVE_ELECTRODE, product.GetProductGuid(), factory.GetFactoryId(), product.GetProductId(), negativeElectrodeUsage.ToString());
 
         if (Configration.Instance.standAloneMode == true)
         {
@@ -236,7 +242,7 @@ public class WareHouse : SerializedMonoBehaviour
         }
         else
         {
-            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), negativeElectrodeID, (int)negativeElectrodeUsage, ApplyConsumeResource);
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), negativeElectrodeID, (int)negativeElectrodeUsage);
         }
 
         UpdateResourceObject();
@@ -252,6 +258,7 @@ public class WareHouse : SerializedMonoBehaviour
         float electrolyticUsage = Configration.Instance.stackingInputResource[electrolytic];
 
         factory.StatisticArchive(statisticType.MATERIAL_USAGE_ELECTROLYTIC, electrolyticUsage);
+        APIHandler.Instance.OriginUsageMaterial(LOGType.ORIGIN_USAGE_ELECTROLYTIC, IngredientType.ELECTROLYTIC, product.GetProductGuid(), factory.GetFactoryId(), product.GetProductId(), electrolyticUsage.ToString());
 
         if (Configration.Instance.standAloneMode == true)
         {
@@ -259,10 +266,19 @@ public class WareHouse : SerializedMonoBehaviour
         }
         else
         {
-            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), electrolyticID, (int)electrolyticUsage, ApplyConsumeResource);
+            APIHandler.Instance.ReportStockConsume(APIType.REPORT_STOCK_CONSUME, factory.GetFactoryId(), electrolyticID, (int)electrolyticUsage);
         }
 
         UpdateResourceObject();
         return;
+    }
+
+    IEnumerator PeriodicStorageUpdate()
+    {
+        while(true)
+        {
+             APIHandler.Instance.GetStorageInfo(APIType.GET_STORAGE_INFO, factory.GetFactoryId(), ApplyServerRes);
+            yield return new WaitForSeconds(5.0f);
+        }
     }
 }

@@ -111,6 +111,11 @@ namespace Assets.Scripts.Config
         {
             return machineID;
         }
+
+        public MachineStatus GetMachineStatus()
+        {
+            return machineStatus;
+        }
         public Truck GetTruck()
         {
             return targetTruck;
@@ -197,8 +202,8 @@ namespace Assets.Scripts.Config
 
             if (machineType == MachineType.TEST_MACHINE)
             {
-                bool isGood = nowProduct.isGoodProduct();
-                if (isGood == false)
+                ProcessType isGood = nowProduct.isGoodProduct();
+                if (isGood != ProcessType.NONE)
                 {
                     factory.StatisticArchive(statisticType.PRODUCT_TEST_FAIL_COUNT);
                     nowProduct.WasteProduct();
@@ -262,9 +267,9 @@ namespace Assets.Scripts.Config
             yield return null;
         }
 
-        IEnumerator DisplayTestResult(bool result)
+        IEnumerator DisplayTestResult(ProcessType result)
         {
-            if(result == true)
+            if(result == ProcessType.NONE)
             {
                 RedLight.material = factory.machineVisualizeMaterial["BLUE"];
             }

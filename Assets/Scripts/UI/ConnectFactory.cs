@@ -7,6 +7,7 @@ using System;
 using Asset.Script.Backend;
 using UnityEngine.SceneManagement;
 using Assets.Scripts;
+using static API_DTO;
 
 public class ConnectFactory : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class ConnectFactory : MonoBehaviour
     public TMP_Dropdown ExistedFactoryList_Dropdown;
     public TMP_Text Message_Text;
     public Button Connect_Button;
+
+    private API_DTO.ResponseFactoryListDTO FactoryInfos;
 
     public enum Msg_type
     {
@@ -67,7 +70,14 @@ public class ConnectFactory : MonoBehaviour
 
     public void selectDropdownValue()
     {
-        FactoryName_InputField.text = ExistedFactoryList_Dropdown.options[ExistedFactoryList_Dropdown.value].text;
+        if (ExistedFactoryList_Dropdown.value == 1)
+        {
+            FactoryName_InputField.text = "";
+        }
+        else
+        {
+            FactoryName_InputField.text = ExistedFactoryList_Dropdown.options[ExistedFactoryList_Dropdown.value].text;
+        }
         OnClickFactoryList();
     }
 
@@ -91,17 +101,22 @@ public class ConnectFactory : MonoBehaviour
             messageOutput(Msg_type.NETWORK_CONNECTION_ERROR);
             return false;
         }
+        ExistedFactoryList_Dropdown.ClearOptions();
+        ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData("공장 목록"));
+        ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData("새로운 공장"));
         API_DTO.ResponseFactoryListDTO factorys;
+        FactoryInfos = res;
         foreach (API_DTO.FactoryInfoDTO factory in res.factoryList)
         {
+            
             factorys = new API_DTO.ResponseFactoryListDTO();
             factorys.factoryList = new List<API_DTO.FactoryInfoDTO>
             {
                 factory
             };            
-            TMPro.TMP_Dropdown.OptionData option = new TMPro.TMP_Dropdown.OptionData(factory.factoryName);
+            TMPro.TMP_Dropdown.OptionData option = new TMPro.TMP_Dropdown.OptionData(factory.name);
             
-            ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData(factory.factoryName));
+            ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData(factory.name));
         }
 
         return true;
@@ -123,15 +138,9 @@ public class ConnectFactory : MonoBehaviour
         Configration.Instance.serverHost = URL_InputField.text;
         if (Configration.Instance.standAloneMode == true)
         {
-            API_DTO.ConnectFactoryDTO connectFactoryDTO = new API_DTO.ConnectFactoryDTO();
+            API_DTO.ResponseLoginLogoutDto connectFactoryDTO = new API_DTO.ResponseLoginLogoutDto();
             connectFactoryDTO.id = 1;
             connectFactoryDTO.name = FactoryName_InputField.text;
-            connectFactoryDTO.income = 100;
-            connectFactoryDTO.outcome = 100;
-            connectFactoryDTO.asset = 100;
-            connectFactoryDTO.totalCount = 100;
-            connectFactoryDTO.successCount = 90;
-            connectFactoryDTO.status = true;
             ConnectToFactory(connectFactoryDTO);
         }
         else
@@ -140,21 +149,20 @@ public class ConnectFactory : MonoBehaviour
         }
     }
 
-    private bool ConnectToFactory(API_DTO.ConnectFactoryDTO res)
+    private bool ConnectToFactory(API_DTO.ResponseLoginLogoutDto res)
     {
         if (res == null)
         {
             messageOutput(Msg_type.NETWORK_CONNECTION_ERROR);
             return false;
         }
-        if(res.id == -1)
-        {
-            messageOutput(Msg_type.FACTORY_CONNECTION_ERROR);
-            return false;
-        }
+        FactoryInfoDTO loginFactoryInfo = FactoryInfos.factoryList.Find(x => x.id == res.id);
         Configration.Instance.factoryId = res.id;
         Configration.Instance.factoryName = res.name;
-        Configration.Instance.totalCount = res.totalCount;
+        if (Configration.Instance.standAloneMode == true)
+        {
+            Configration.Instance.totalCount = loginFactoryInfo.totalCount;
+        }
         Debug.Assert(Configration.Instance.startAtFactoryMode == false, "공장시작 모드로 설정되어있습니다.");
         SceneManager.LoadScene("Factory");
 

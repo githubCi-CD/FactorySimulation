@@ -10,18 +10,18 @@ public class BackendDemoData : MonoBehaviour
         responseFactoryListDTO.factoryList = new List<API_DTO.FactoryInfoDTO>();
 
         API_DTO.FactoryInfoDTO factoryInfoDTO = new API_DTO.FactoryInfoDTO();
-        factoryInfoDTO.factoryId = 1;
-        factoryInfoDTO.factoryName = "factory1";
+        factoryInfoDTO.id = 1;
+        factoryInfoDTO.name = "factory1";
         responseFactoryListDTO.factoryList.Add(factoryInfoDTO);
 
         factoryInfoDTO = new API_DTO.FactoryInfoDTO();
-        factoryInfoDTO.factoryId = 2;
-        factoryInfoDTO.factoryName = "factory2";
+        factoryInfoDTO.id = 2;
+        factoryInfoDTO.name = "factory2";
         responseFactoryListDTO.factoryList.Add(factoryInfoDTO);
 
         factoryInfoDTO = new API_DTO.FactoryInfoDTO();
-        factoryInfoDTO.factoryId = 3;
-        factoryInfoDTO.factoryName = "factory3";
+        factoryInfoDTO.id = 3;
+        factoryInfoDTO.name = "factory3";
         responseFactoryListDTO.factoryList.Add(factoryInfoDTO);
 
         return responseFactoryListDTO;

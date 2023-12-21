@@ -159,7 +159,7 @@ public class CCTVInfoText : MonoBehaviour
     {
         while (true)
         {
-            CAMText.text = Monitoring.nowViweingCameraName();
+            CAMText.text = factory.FactoryName + " : " + Monitoring.nowViweingCameraName();
             yield return new WaitForEndOfFrame();
         }
     }

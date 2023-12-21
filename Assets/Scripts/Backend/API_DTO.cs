@@ -23,8 +23,14 @@ public class API_DTO : MonoBehaviour
     [Serializable]
     public class FactoryInfoDTO
     {
-        public long factoryId;
-        public string factoryName;
+        public long id;
+        public string name;
+        public long income;
+        public long outcome;
+        public long asset;
+        public long totalCount;
+        public long successCount;
+        public bool status;
     }
 
     /// <summary>
@@ -52,15 +58,42 @@ public class API_DTO : MonoBehaviour
         public bool status;
     }
 
+    [Serializable]
+    public class LoginLogoutBodyFormat
+    {
+        public string name;
+    }
+
+    [Serializable]
+    public class ResponseLoginLogoutDto
+    {
+        public long id;
+        public string name;
+    }
+    [Serializable]
+    public class originInfo
+    {
+        public long id;
+        public string name;
+        public long price;
+    }
+
+    [Serializable]
+    public class StorageOrigin
+    {
+        public long id;
+        public long count;
+        public long factoryId;
+        public originInfo origin;
+    }
+
     ///<summary>
     /// GET_STORAGE_INFO
     /// </summary>
     [Serializable]
     public class GetStorageInfoDTO
     {
-        public long factoryId;
-        public long originId;
-        public int count;
+        public List<StorageOrigin> storageList;
     }
 
     ///<summary>
@@ -75,25 +108,13 @@ public class API_DTO : MonoBehaviour
     }
 
     ///<summary>
-    /// GET_FACTORY_CAPITAL
-    /// </summary>
-    [Serializable]
-    public class GetFactoryCapitalDTO
-    {
-        public long id; // factoryId
-        public string name;
-        public long price;
-    }
-
-    ///<summary>
     /// REPORT_STOCK_CONSUME
     /// </summary>
     [Serializable]
-    public class ReportStockConsumeDTO
+    public class ReportStockConsumeBodyFormat
     {
-        public long factoryId;
+        public long id;
         public int count;
-        public long originId;
     }
 
     ///<summary>
@@ -108,23 +129,65 @@ public class API_DTO : MonoBehaviour
     }
 
     ///<summary>
-    /// LOG_PRODUCE_PRODUCT
-    /// </summary>
-    [Serializable]
-    public class LogProduceProductDTO
-    {
-        public long factoryId;
-        public long productId;
-    }
-
-    ///<summary>
     /// LOG_PRODUCT_FAULTY
     /// </summary>
     [Serializable]
-    public class LogProductFaultyDTO
+    public class LogDTO
     {
+        public string uuid;
         public long factoryId;
         public long productId;
-        public int faultyProcess;
+        public string logType;
+        public string time;
+        public string status;
+    }
+
+    [Serializable]
+    public class SearchResponse
+    {
+        public int took;
+        public bool timed_out;
+        public Shards _shards;
+        public Hits hits;
+    }
+
+    [Serializable]
+    public class Shards
+    {
+        public int total;
+        public int successful;
+        public int skipped;
+        public int failed;
+    }
+
+    [Serializable]
+    public class Hits
+    {
+        public Total total;
+        public double max_score;
+        public Hit[] hits;
+    }
+
+    [Serializable]
+    public class Total
+    {
+        public int value;
+        public string relation;
+    }
+
+    [Serializable]
+    public class Hit
+    {
+        public string _index;
+        public string _id;
+        public double _score;
+        public Source _source;
+        public int[] sort;
+    }
+
+    [Serializable]
+    public class Source
+    {
+        public int productId;
     }
 }

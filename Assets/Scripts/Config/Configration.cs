@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Assets.Scripts;
 
 public class Configration : SerializedMonoBehaviour
 {
@@ -22,7 +23,10 @@ public class Configration : SerializedMonoBehaviour
         {
             Destroy(this.gameObject);
         }
-    }
+        mixCoatingProcessFailRate = Possibility.getRandomFaultyPossiblility();
+        pressingProcessFailRate = Possibility.getRandomFaultyPossiblility();
+        stackingProcessFailRate = Possibility.getRandomFaultyPossiblility();
+}
 
     public static Configration Instance
     {
@@ -65,6 +69,8 @@ public class Configration : SerializedMonoBehaviour
     public float pressingProcessFailRateRange ;
     public float stackingProcessFailRate;
     public float stackingProcessFailRateRange;
+    public float RandomPossibleRateMin;
+    public float RandomPossibleRateMax;
 
     [Header("Truck Setting")]
     public int MaxLuguageCount = 25;
@@ -73,6 +79,10 @@ public class Configration : SerializedMonoBehaviour
     public string serverHost = "http://192.168.0.102";
     public string resourceManageAPIPort = "30081";
     public string factoryManageAPIPort = "30082";
+    public string elasticServerHost = "http://192.168.0.100";
+    public string elasticServerPort = "9200";
+    public string logstashServerPort = "7744";
+    public string elasticServerIndex = "factorylog";
 
     [Header("Monitoring Setting")]
     public float cameraSpeed = 1.0f;

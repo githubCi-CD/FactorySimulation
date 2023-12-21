@@ -22,15 +22,16 @@ namespace Assets.Scripts.Config
         PRESSING,
         STACKING,
         TESTING,
-        SHIPPING
+        SHIPPING,
+        NONE
     }
 
     public enum IngredientType
     {
-        ACTIVE_LIQUID,
-        NMP,
-        NEGATIVE_ELECTRODE,
-        ELECTROLYTIC
+        ACTIVE_LIQUID = 1,
+        NMP = 2,
+        NEGATIVE_ELECTRODE = 3,
+        ELECTROLYTIC = 4
     }
 
     public enum MachineStatus

@@ -42,10 +42,6 @@ namespace Assets.Scripts
 
         public void SellingProduct(Product product)
         {
-            if (Configration.Instance.standAloneMode == false)
-            {
-                APIHandler.Instance.ReportProductSell(APIType.REPORT_PRODUCT_SELL, factory.GetFactoryId(), product.GetProductId(), CheckApplySell);
-            }
             Destroy(product.gameObject);
         }
 

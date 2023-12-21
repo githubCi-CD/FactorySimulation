@@ -45,6 +45,11 @@ namespace Assets.Scripts
         {
             return FactoryId;
         }
+
+        public long GetProductCount()
+        {
+            return ProductCount;
+        }
         public long IssuanceID()
         {
             ProductCount += 1;
@@ -65,6 +70,10 @@ namespace Assets.Scripts
                 FactoryName = "TestFactory";
                 ProductCount = 0;
             }
+            if(Configration.Instance.standAloneMode == false)
+            {
+                APIHandler.Instance.GetMaxProductID(APIType.GET_MAX_PRODUCT_ID, FactoryId, InitFactoryProductId);
+            }
             int IDStart = 1; 
             foreach (var machine in machines)
             {
@@ -74,6 +83,21 @@ namespace Assets.Scripts
             truck = GameObject.FindWithTag("Truck").GetComponent<Truck>();
             wareHouse = GameObject.FindWithTag("Warehouse").GetComponent<WareHouse>();
             factoryStatistic = GetComponent<FactoryStatistic>();
+        }
+
+        public bool InitFactoryProductId(long res)
+        {
+            ProductCount = res;
+            return true;
+        }
+
+        public void GetOutFromFactory()
+        {
+            if(Configration.Instance.standAloneMode == false)
+            {
+
+                APIHandler.Instance.DisconnectFactory(APIType.DISCONNECT_FACTORY, FactoryName);
+            }
         }
 
         public void StatisticArchive(statisticType type, float value = 0)
@@ -120,16 +144,19 @@ namespace Assets.Scripts
             nextPq.StartDeliveryToWaitingPoint(product);
         }
 
-        public void TestProcessComplete(bool isGood, Product product)
+        public void TestProcessComplete(ProcessType isGood, Product product)
         {
-            if(isGood == true)
+            if(isGood == ProcessType.NONE)
             {
                 ProductQueue truckPq = productQueues.Find(x => x.GetTargetMachine().GetMachineType() == MachineType.SHIPPING_TRUCK);
                 truckPq.StartDeliveryToTruck(product);
+                APIHandler.Instance.ProductSuccess(APIType.REPORT_PRODUCT_SUCCESS, FactoryId);
+                APIHandler.Instance.LogProduceSuccess(LOGType.PRODUCT_TEST_SUCCESS, product.GetProductGuid(),FactoryId, product.GetProductId());
             }
             else
             {
-                //불량품 API 호출
+                APIHandler.Instance.ProductFailure(APIType.REPORT_PRODUCT_FAULTY, FactoryId);
+                APIHandler.Instance.LogProductFaulty(LOGType.PRODUCT_TEST_FAIL, product.GetProductGuid(), FactoryId, product.GetProductId(), isGood.ToString());
             }
         }
 

@@ -11,10 +11,22 @@ namespace Assets.Scripts
 
         public static bool isProcessingSuccess(float ProcessFailRate, float RateRange)
         {
+            int seed = System.Environment.TickCount;
+            UnityEngine.Random.InitState(seed);
+            float randomPossibility = UnityEngine.Random.Range((ProcessFailRate - RateRange)* Acurracy, (ProcessFailRate + RateRange) * Acurracy);
 
-            float randomPossibility = UnityEngine.Random.Range(ProcessFailRate - RateRange, ProcessFailRate + RateRange);
+            seed = System.Environment.TickCount;
+            UnityEngine.Random.InitState(seed);
             int randNum = (int)UnityEngine.Random.Range(1, Acurracy);
-            return (randNum > (randomPossibility *Acurracy));
+            return (randNum > (randomPossibility));
+        }
+
+        public static float getRandomFaultyPossiblility()
+        {
+            int seed = System.Environment.TickCount;
+            UnityEngine.Random.InitState(seed);
+            int randomPossibility = UnityEngine.Random.Range((int)(Configration.Instance.RandomPossibleRateMin * Acurracy), (int)(Configration.Instance.RandomPossibleRateMax * Acurracy));
+            return (float)randomPossibility / Acurracy;
         }
     }
 }
