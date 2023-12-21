@@ -11,14 +11,14 @@ using static API_DTO;
 
 namespace Asset.Script.Backend
 {
-    //FactoryDTO : °øÀå Á¤º¸ ¿äÃ»½Ã »ç¿ëµÇ´Â DTO
-    //LoginDTO : ·Î±×ÀÎ ¿äÃ»½Ã »ç¿ëµÇ´Â DTO
+    //FactoryDTO : ê³µì¥ ì •ë³´ ìš”ì²­ì‹œ ì‚¬ìš©ë˜ëŠ” DTO
+    //LoginDTO : ë¡œê·¸ì¸ ìš”ì²­ì‹œ ì‚¬ìš©ë˜ëŠ” DTO
     //https://github.com/githubCi-CD/factory/blob/main/src/main/kotlin/spring/factotry/dto/LoginDto.kt
 
-    //OriginDTO : ¿øÀÚÀç ¿äÃ»½Ã »ç¿ëµÇ´Â DTO
+    //OriginDTO : ì›ìì¬ ìš”ì²­ì‹œ ì‚¬ìš©ë˜ëŠ” DTO
     //https://github.com/githubCi-CD/factory/blob/main/src/main/kotlin/spring/factotry/dto/OriginDto.kt
 
-    //StorageDto : Ã¢°í Á¤º¸ ¿äÃ»½Ã »ç¿ëµÇ´Â DTO
+    //StorageDto : ì°½ê³  ì •ë³´ ìš”ì²­ì‹œ ì‚¬ìš©ë˜ëŠ” DTO
     //https://github.com/githubCi-CD/factory/blob/main/src/main/kotlin/spring/factotry/dto/StorageDto.kt
 
     
@@ -86,12 +86,12 @@ namespace Asset.Script.Backend
         {
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                Debug.Log("ÀÎÅÍ³İ ¿¬°áÀ» È®ÀÎÇÏ¼¼¿ä.");
+                Debug.Log("ì¸í„°ë„· ì—°ê²°ì„ í™•ì¸í•˜ì„¸ìš”.");
             }
         }
 
         /// <summary>
-        /// ÀÏ´Ü »ç¿ëÇÏÁö ¾ÊÀ½
+        /// ì¼ë‹¨ ì‚¬ìš©í•˜ì§€ ì•ŠìŒ
         /// </summary>
         /// <param name="apiType"></param>
         /// <param name="afterFunc"></param>
@@ -109,7 +109,7 @@ namespace Asset.Script.Backend
             return serverConnTest;
         }
         /// <summary>
-        /// ÀÏ´Ü »ç¿ëÇÏÁö ¾ÊÀ½
+        /// ì¼ë‹¨ ì‚¬ìš©í•˜ì§€ ì•ŠìŒ
         /// </summary>
         /// <param name="callback"></param>
         /// <returns></returns>
@@ -186,12 +186,12 @@ namespace Asset.Script.Backend
                 {
                     callback(0);
                 }
-                Debug.Log("Á¦Ç° ½ÃÀÛ ¹øÈ£¸¦ °¡Á®¿Ô½À´Ï´Ù. Start ProductId : " + res.hits.hits[0]._source.productId);
+                Debug.Log("ì œí’ˆ ì‹œì‘ ë²ˆí˜¸ë¥¼ ê°€ì ¸ì™”ìŠµë‹ˆë‹¤. Start ProductId : " + res.hits.hits[0]._source.productId);
                 callback(res.hits.hits[0]._source.productId);
             }
             else
             {
-                Debug.Assert(false, "·Î±×ÀÎ ½ÇÆĞ");
+                Debug.Assert(false, "ë¡œê·¸ì¸ ì‹¤íŒ¨");
                 callback(-1);
             }
         }
@@ -218,7 +218,7 @@ namespace Asset.Script.Backend
                 yield return webRequest.SendWebRequest();
                 if(webRequest.result == UnityWebRequest.Result.ConnectionError)
                 {
-                    Debug.Log("³×Æ®¿öÅ© ¿¡·¯");
+                    Debug.Log("ë„¤íŠ¸ì›Œí¬ ì—ëŸ¬");
                 }
                 else
                 {
@@ -265,12 +265,12 @@ namespace Asset.Script.Backend
             if (webRequest.result == UnityWebRequest.Result.Success)
             {
                 API_DTO.ResponseLoginLogoutDto res = JsonUtility.FromJson<API_DTO.ResponseLoginLogoutDto>(webRequest.downloadHandler.text);
-                Debug.Log("·Î±×ÀÎ¿¡ ¼º°øÇß½À´Ï´Ù. FactoryName : " + res.name);
+                Debug.Log("ë¡œê·¸ì¸ì— ì„±ê³µí–ˆìŠµë‹ˆë‹¤. FactoryName : " + res.name);
                 callback(res);
             }
             else
             {
-                Debug.Assert(false, "·Î±×ÀÎ ½ÇÆĞ");
+                Debug.Assert(false, "ë¡œê·¸ì¸ ì‹¤íŒ¨");
                 callback(null);
             }
         }
@@ -299,11 +299,11 @@ namespace Asset.Script.Backend
 
             if(webRequest.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("·Î±×¾Æ¿ô ¿Ï·á");
+                Debug.Log("ë¡œê·¸ì•„ì›ƒ ì™„ë£Œ");
             }
             else
             {
-                Debug.Log("·Î±×¾Æ¿ô ½ÇÆĞ");
+                Debug.Log("ë¡œê·¸ì•„ì›ƒ ì‹¤íŒ¨");
             }
 
 #if UNITY_EDITOR
@@ -345,7 +345,7 @@ namespace Asset.Script.Backend
                 else
                 {
                     callback(null);
-                    Debug.Log("³×Æ®¿öÅ© ¿¡·¯");
+                    Debug.Log("ë„¤íŠ¸ì›Œí¬ ì—ëŸ¬");
                 }
             }
         }
@@ -383,7 +383,7 @@ namespace Asset.Script.Backend
                 else
                 {
                     callback(null);
-                    Debug.Log("³×Æ®¿öÅ© ¿¡·¯");
+                    Debug.Log("ë„¤íŠ¸ì›Œí¬ ì—ëŸ¬");
                 }
             }
         }
@@ -425,7 +425,7 @@ namespace Asset.Script.Backend
                 yield return webRequest.SendWebRequest();
                 if (webRequest.result == UnityWebRequest.Result.ConnectionError)
                 {
-                    Debug.Log("³×Æ®¿öÅ© ¿¡·¯");
+                    Debug.Log("ë„¤íŠ¸ì›Œí¬ ì—ëŸ¬");
                 }
                 else
                 {
@@ -457,7 +457,7 @@ namespace Asset.Script.Backend
                 yield return webRequest.SendWebRequest();
                 if (webRequest.result == UnityWebRequest.Result.Success)
                 {
-                    Debug.Log("¹°°Ç ÆÈ±â ¼º°ø");
+                    Debug.Log("ë¬¼ê±´ íŒ”ê¸° ì„±ê³µ");
                 }
                 else
                 {
@@ -484,7 +484,7 @@ namespace Asset.Script.Backend
                 yield return webRequest.SendWebRequest();
                 if (webRequest.result == UnityWebRequest.Result.Success)
                 {
-                    Debug.Log("¹°°Ç Æó±â ¼º°ø");
+                    Debug.Log("ë¬¼ê±´ íê¸° ì„±ê³µ");
                 }
                 else
                 {
@@ -521,11 +521,11 @@ namespace Asset.Script.Backend
 
             if (webRequest.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("¿øÀÚÀç »ç¿ë¿¡ ¼º°øÇß½À´Ï´Ù.");
+                Debug.Log("ì›ìì¬ ì‚¬ìš©ì— ì„±ê³µí–ˆìŠµë‹ˆë‹¤.");
             }
             else
             {
-                Debug.Assert(false, "·Î±×¾Æ¿ô ½ÇÆĞ");
+                Debug.Assert(false, "ë¡œê·¸ì•„ì›ƒ ì‹¤íŒ¨");
             }
 
         }
@@ -620,11 +620,11 @@ namespace Asset.Script.Backend
 
             if (webRequest.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("·Î±×±â·Ï ¼º°ø" + dto.logType);
+                Debug.Log("ë¡œê·¸ê¸°ë¡ ì„±ê³µ" + dto.logType);
             }
             else
             {
-                Debug.Assert(false, "·Î±×±â·Ï ½ÇÆĞ");
+                Debug.Assert(false, "ë¡œê·¸ê¸°ë¡ ì‹¤íŒ¨");
             }
 
         }

@@ -24,7 +24,7 @@ public class WareHouse : SerializedMonoBehaviour
     private void Start()
     {
         factory = GameObject.FindWithTag("Factory").GetComponent<Factory>();
-        // nowInventoryø° Init Inventory ∫πªÁ
+        // nowInventoryÏóê Init Inventory Î≥µÏÇ¨
         foreach (KeyValuePair<string, float> item in Configration.Instance.init_Inventory)
         {
             if (nowInventory.ContainsKey(item.Key))

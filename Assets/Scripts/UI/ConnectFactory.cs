@@ -29,10 +29,10 @@ public class ConnectFactory : MonoBehaviour
     }
     private List<String> msg_set = new List<string>()
     {
-        $"È£½ºÆ®:{0}¿¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.(³×Æ®¿öÅ© ¿À·ù)",
-        $"°øÀå:{0}¿¡ Á¢¼ÓÇÒ ¼ö ¾ø½À´Ï´Ù.",
-        $"È£½ºÆ®¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä",
-        $"°øÀåÀÌ¸§À» ÀÔ·ÂÇØÁÖ¼¼¿ä",
+        $"í˜¸ìŠ¤íŠ¸:{0}ì— ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.(ë„¤íŠ¸ì›Œí¬ ì˜¤ë¥˜)",
+        $"ê³µì¥:{0}ì— ì ‘ì†í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.",
+        $"í˜¸ìŠ¤íŠ¸ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”",
+        $"ê³µì¥ì´ë¦„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”",
     };
 
     public void messageOutput(Msg_type msg)
@@ -65,7 +65,7 @@ public class ConnectFactory : MonoBehaviour
         ExistedFactoryList_Dropdown.onValueChanged.AddListener(delegate { OnClickFactoryList(); });
         ExistedFactoryList_Dropdown.onValueChanged.AddListener(delegate { selectDropdownValue(); });
         Connect_Button.onClick.AddListener( delegate { OnClickConnect();  });
-        Message_Text.text = "[°øÀåÀÌ¸§]¶õ¿¡ »õ·Î¿î ÀÌ¸§À» ÀÛ¼ºÇÏ¸é »õ·Î¿î °øÀåÀÌ °³¼³µË´Ï´Ù.";
+        Message_Text.text = "[ê³µì¥ì´ë¦„]ë€ì— ìƒˆë¡œìš´ ì´ë¦„ì„ ì‘ì„±í•˜ë©´ ìƒˆë¡œìš´ ê³µì¥ì´ ê°œì„¤ë©ë‹ˆë‹¤.";
     }
 
     public void selectDropdownValue()
@@ -102,8 +102,8 @@ public class ConnectFactory : MonoBehaviour
             return false;
         }
         ExistedFactoryList_Dropdown.ClearOptions();
-        ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData("°øÀå ¸ñ·Ï"));
-        ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData("»õ·Î¿î °øÀå"));
+        ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData("ê³µì¥ ëª©ë¡"));
+        ExistedFactoryList_Dropdown.options.Add(new TMP_Dropdown.OptionData("ìƒˆë¡œìš´ ê³µì¥"));
         API_DTO.ResponseFactoryListDTO factorys;
         FactoryInfos = res;
         foreach (API_DTO.FactoryInfoDTO factory in res.factoryList)
@@ -163,7 +163,7 @@ public class ConnectFactory : MonoBehaviour
         {
             Configration.Instance.totalCount = loginFactoryInfo.totalCount;
         }
-        Debug.Assert(Configration.Instance.startAtFactoryMode == false, "°øÀå½ÃÀÛ ¸ğµå·Î ¼³Á¤µÇ¾îÀÖ½À´Ï´Ù.");
+        Debug.Assert(Configration.Instance.startAtFactoryMode == false, "ê³µì¥ì‹œì‘ ëª¨ë“œë¡œ ì„¤ì •ë˜ì–´ìˆìŠµë‹ˆë‹¤.");
         SceneManager.LoadScene("Factory");
 
         return true;

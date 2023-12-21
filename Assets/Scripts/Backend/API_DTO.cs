@@ -18,7 +18,7 @@ public class API_DTO : MonoBehaviour
     //LOG_PRODUCT_FAULTY
 
     /// <summary>
-    /// GET_FACTORY_LIST гою╖ ╟╢ц╪
+    /// GET_FACTORY_LIST ц┤ц▐ц─б╖ б╟б╢ц┐б╪
     /// </summary>
     [Serializable]
     public class FactoryInfoDTO

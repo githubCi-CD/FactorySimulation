@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Config;
+using Assets.Scripts.Config;
 using System;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
